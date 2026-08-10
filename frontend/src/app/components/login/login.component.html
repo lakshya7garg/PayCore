@@ -1,0 +1,58 @@
+<div class="min-vh-100 d-flex flex-column justify-content-center align-items-center bg-light py-5">
+  <div class="card p-4 shadow-sm" style="max-width: 420px; width: 100%;">
+    <div class="text-center mb-4">
+      <h3 class="fw-bold text-dark mb-1">PayCore</h3>
+      <p class="text-muted small">Payroll & HR Management Portal</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger p-2 small mb-3" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          class="form-control" 
+          placeholder="admin@paycore.com"
+          [ngClass]="{ 'is-invalid': loginForm.get('email')?.touched && loginForm.get('email')?.invalid }"
+        >
+        <div class="invalid-feedback">
+          Please enter a valid email address.
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          class="form-control" 
+          placeholder="••••••••"
+          [ngClass]="{ 'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid }"
+        >
+        <div class="invalid-feedback">
+          Password is required.
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 py-2 fw-medium" [disabled]="loading">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Sign In
+      </button>
+    </form>
+
+    <div class="mt-4 pt-3 border-top text-center">
+      <p class="text-muted small mb-2 fw-medium">Quick Demo Quick-fill:</p>
+      <div class="d-flex justify-content-center gap-2">
+        <button class="btn btn-outline-secondary btn-sm" (click)="fillDemo('admin@paycore.com')">Admin</button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="fillDemo('employee@paycore.com')">Employee</button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="fillDemo('accountant@paycore.com')">Accountant</button>
+      </div>
+    </div>
+  </div>
+</div>

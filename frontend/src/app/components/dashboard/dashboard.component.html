@@ -1,0 +1,189 @@
+<div class="container-fluid p-4">
+  <!-- Header Banner -->
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+      <h4 class="fw-bold mb-1">Welcome back, {{ fullName }}</h4>
+      <p class="text-muted small mb-0">Role: <span class="badge bg-secondary">{{ role }}</span> &bull; Employee ID: {{ employeeCode || 'N/A' }}</p>
+    </div>
+  </div>
+
+  <!-- Admin / Accountant View -->
+  <div *ngIf="authService.isAdmin() || authService.isAccountant()">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card p-3">
+          <div class="text-muted small">Total Employees</div>
+          <div class="h3 fw-bold mb-0 text-primary">{{ totalEmployees }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3">
+          <div class="text-muted small">Pending Leave Approvals</div>
+          <div class="h3 fw-bold mb-0 text-warning">{{ pendingLeavesCount }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3">
+          <div class="text-muted small">System Status</div>
+          <div class="h3 fw-bold mb-0 text-success">Active / Healthy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Recent Employees Table -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center py-3">
+            <span class="mb-0">Recent Employees</span>
+            <a routerLink="/employees" class="btn btn-sm btn-outline-primary" *ngIf="authService.isAdmin()">View All</a>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table mb-0">
+                <thead>
+                  <tr>
+                    <th>Emp ID</th>
+                    <th>Name</th>
+                    <th>Designation</th>
+                    <th>Department</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let emp of recentEmployees">
+                    <td class="fw-medium">{{ emp.employeeCode }}</td>
+                    <td>{{ emp.firstName }} {{ emp.lastName }}</td>
+                    <td>{{ emp.designation }}</td>
+                    <td>{{ emp.department || 'N/A' }}</td>
+                  </tr>
+                  <tr *ngIf="recentEmployees.length === 0">
+                    <td colspan="4" class="text-center text-muted py-3">No employees found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Leave Requests -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center py-3">
+            <span class="mb-0">Recent Leave Requests</span>
+            <a routerLink="/leaves" class="btn btn-sm btn-outline-primary" *ngIf="authService.isAdmin()">View All</a>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table mb-0">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let leave of recentLeaves">
+                    <td>{{ leave.employeeName }}</td>
+                    <td>{{ leave.leaveType }}</td>
+                    <td>{{ leave.daysCount }} Day(s)</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'bg-warning text-dark': leave.status === 'PENDING',
+                        'bg-success': leave.status === 'APPROVED',
+                        'bg-danger': leave.status === 'REJECTED'
+                      }">{{ leave.status }}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="recentLeaves.length === 0">
+                    <td colspan="4" class="text-center text-muted py-3">No leave requests found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee View -->
+  <div *ngIf="authService.isEmployee()">
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="card p-3">
+          <div class="text-muted small">My Applied Leaves</div>
+          <div class="h3 fw-bold mb-0 text-primary">{{ myLeaveCount }}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3">
+          <div class="text-muted small">Generated Payslips</div>
+          <div class="h3 fw-bold mb-0 text-success">{{ myPayslipsCount }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6" *ngIf="selfProfile">
+        <div class="card p-3">
+          <h5 class="fw-bold mb-3 border-bottom pb-2">My Profile Summary</h5>
+          <div class="row g-2 text-sm">
+            <div class="col-4 text-muted">Full Name:</div>
+            <div class="col-8 fw-medium">{{ selfProfile.firstName }} {{ selfProfile.lastName }}</div>
+
+            <div class="col-4 text-muted">Employee Code:</div>
+            <div class="col-8 fw-medium">{{ selfProfile.employeeCode }}</div>
+
+            <div class="col-4 text-muted">Email:</div>
+            <div class="col-8 fw-medium">{{ selfProfile.email }}</div>
+
+            <div class="col-4 text-muted">Mobile:</div>
+            <div class="col-8 fw-medium">{{ selfProfile.mobileNumber }}</div>
+
+            <div class="col-4 text-muted">Designation:</div>
+            <div class="col-8 fw-medium">{{ selfProfile.designation }}</div>
+
+            <div class="col-4 text-muted">Department:</div>
+            <div class="col-8 fw-medium">{{ selfProfile.department }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header py-3">My Recent Payslips</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table mb-0">
+                <thead>
+                  <tr>
+                    <th>Month/Year</th>
+                    <th>Gross</th>
+                    <th>Net Pay</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ps of myPayslips">
+                    <td>{{ ps.monthName }} {{ ps.year }}</td>
+                    <td>${{ ps.grossSalary }}</td>
+                    <td class="fw-bold text-success">${{ ps.netPay }}</td>
+                    <td>
+                      <a routerLink="/salary" class="btn btn-sm btn-outline-secondary">View</a>
+                    </td>
+                  </tr>
+                  <tr *ngIf="myPayslips.length === 0">
+                    <td colspan="4" class="text-center text-muted py-3">No payslips available yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

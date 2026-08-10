@@ -1,0 +1,313 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+      <h4 class="fw-bold mb-1">Payroll & Salary Management</h4>
+      <p class="text-muted small mb-0">Salary structures, payslip calculations, and leave deductions</p>
+    </div>
+
+    <!-- Navigation Tabs for Admin -->
+    <div class="btn-group" *ngIf="authService.isAdmin() || authService.isAccountant()">
+      <button class="btn btn-sm" [ngClass]="activeTab === 'structures' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'structures'">Salary Structures</button>
+      <button class="btn btn-sm" [ngClass]="activeTab === 'generate' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'generate'" *ngIf="authService.isAdmin()">Generate Payslip</button>
+      <button class="btn btn-sm" [ngClass]="activeTab === 'payslips' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'payslips'">View Payslips</button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show p-2 small mb-3">
+    {{ successMessage }}
+    <button type="button" class="btn-close p-2" (click)="successMessage=''"></button>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show p-2 small mb-3">
+    {{ errorMessage }}
+    <button type="button" class="btn-close p-2" (click)="errorMessage=''"></button>
+  </div>
+
+  <!-- TAB 1: SALARY STRUCTURES (Admin/Accountant) -->
+  <div *ngIf="activeTab === 'structures' && (authService.isAdmin() || authService.isAccountant())">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold mb-0">Employee Salary Structures</h6>
+      <button class="btn btn-sm btn-primary" (click)="openStructureModal()" *ngIf="authService.isAdmin()">
+        + Assign / Configure Structure
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead>
+              <tr>
+                <th>Emp Code</th>
+                <th>Employee Name</th>
+                <th>Basic Pay</th>
+                <th>HRA</th>
+                <th>Allowances</th>
+                <th>Medical</th>
+                <th>PF Ded.</th>
+                <th>Tax Ded.</th>
+                <th>Total Gross</th>
+                <th>Net Monthly</th>
+                <th *ngIf="authService.isAdmin()" class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let str of salaryStructures">
+                <td class="fw-bold text-primary">{{ str.employeeCode }}</td>
+                <td>{{ str.employeeName }}</td>
+                <td>${{ str.basicSalary }}</td>
+                <td>${{ str.hra }}</td>
+                <td>${{ str.allowances }}</td>
+                <td>${{ str.medicalAllowance }}</td>
+                <td class="text-danger">-${{ str.pfDeduction }}</td>
+                <td class="text-danger">-${{ str.taxDeduction }}</td>
+                <td class="fw-medium">${{ str.totalGross }}</td>
+                <td class="fw-bold text-success">${{ str.totalNet }}</td>
+                <td *ngIf="authService.isAdmin()" class="text-end">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openStructureModal(str)">Edit</button>
+                </td>
+              </tr>
+              <tr *ngIf="salaryStructures.length === 0">
+                <td colspan="11" class="text-center text-muted py-4">No salary structures configured yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: GENERATE PAYSLIP (Admin Only) -->
+  <div *ngIf="activeTab === 'generate' && authService.isAdmin()">
+    <div class="card p-4" style="max-width: 600px;">
+      <h5 class="fw-bold mb-3">Generate Monthly Employee Payslip</h5>
+      <p class="text-muted small">
+        Calculates total gross earnings, PF/Tax deductions, and calculates <strong>Unpaid Leave Deductions</strong> based on approved leave requests in the target month.
+      </p>
+
+      <form [formGroup]="generateForm" (ngSubmit)="onGeneratePayslip()">
+        <div class="mb-3">
+          <label class="form-label">Select Employee *</label>
+          <select formControlName="employeeId" class="form-select">
+            <option value="">-- Choose Employee --</option>
+            <option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.employeeCode }} - {{ emp.firstName }} {{ emp.lastName }} ({{ emp.designation }})
+            </option>
+          </select>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label">Pay Period Month *</label>
+            <select formControlName="month" class="form-select">
+              <option *ngFor="let m of monthOptions" [value]="m.value">{{ m.label }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Pay Period Year *</label>
+            <select formControlName="year" class="form-select">
+              <option *ngFor="let y of yearOptions" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Generate & Notify Employee
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TAB 3: VIEW PAYSLIPS (All Roles) -->
+  <div *ngIf="activeTab === 'payslips'">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold mb-0">Payslip Records</h6>
+
+      <div class="d-flex align-items-center gap-2" *ngIf="authService.isAdmin() || authService.isAccountant()">
+        <label class="text-muted small mb-0">Select Employee:</label>
+        <select class="form-select form-select-sm" style="width: auto;" (change)="onEmployeeSelectForPayslips($event)">
+          <option *ngFor="let emp of employees" [value]="emp.id">
+            {{ emp.employeeCode }} - {{ emp.firstName }} {{ emp.lastName }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead>
+              <tr>
+                <th>Payslip #</th>
+                <th>Employee Code</th>
+                <th>Employee Name</th>
+                <th>Pay Period</th>
+                <th>Gross Salary</th>
+                <th>Unpaid Leaves</th>
+                <th>Total Deductions</th>
+                <th>Net Pay</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let ps of payslips">
+                <td>PS-{{ ps.id }}</td>
+                <td class="fw-bold text-primary">{{ ps.employeeCode }}</td>
+                <td>{{ ps.employeeName }}</td>
+                <td>{{ ps.monthName }} {{ ps.year }}</td>
+                <td>${{ ps.grossSalary }}</td>
+                <td>
+                  <span class="badge bg-warning text-dark" *ngIf="ps.unpaidLeaveDays > 0">{{ ps.unpaidLeaveDays }} Days (-${{ ps.unpaidLeaveDeduction }})</span>
+                  <span class="text-muted" *ngIf="ps.unpaidLeaveDays === 0">0 Days</span>
+                </td>
+                <td class="text-danger">-${{ ps.totalDeductions }}</td>
+                <td class="fw-bold text-success">${{ ps.netPay }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-primary" (click)="openPayslipModal(ps)">View Payslip</button>
+                </td>
+              </tr>
+              <tr *ngIf="payslips.length === 0">
+                <td colspan="9" class="text-center text-muted py-4">No payslip records available.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configure Salary Structure Modal (Admin Only) -->
+  <div class="modal d-block bg-dark bg-opacity-50" tabIndex="-1" *ngIf="isStructureModalOpen">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Configure Salary Structure</h5>
+          <button type="button" class="btn-close" (click)="closeStructureModal()"></button>
+        </div>
+        <form [formGroup]="structureForm" (ngSubmit)="onSaveStructure()">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Employee *</label>
+              <select formControlName="employeeId" class="form-select">
+                <option value="">-- Choose Employee --</option>
+                <option *ngFor="let emp of employees" [value]="emp.id">
+                  {{ emp.employeeCode }} - {{ emp.firstName }} {{ emp.lastName }}
+                </option>
+              </select>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="form-label">Basic Salary ($) *</label>
+                <input type="number" formControlName="basicSalary" class="form-control">
+              </div>
+              <div class="col-6">
+                <label class="form-label">HRA ($) *</label>
+                <input type="number" formControlName="hra" class="form-control">
+              </div>
+              <div class="col-6">
+                <label class="form-label">Allowances ($) *</label>
+                <input type="number" formControlName="allowances" class="form-control">
+              </div>
+              <div class="col-6">
+                <label class="form-label">Medical Allowance ($) *</label>
+                <input type="number" formControlName="medicalAllowance" class="form-control">
+              </div>
+              <div class="col-6">
+                <label class="form-label">PF Deduction ($) *</label>
+                <input type="number" formControlName="pfDeduction" class="form-control">
+              </div>
+              <div class="col-6">
+                <label class="form-label">Tax Deduction ($) *</label>
+                <input type="number" formControlName="taxDeduction" class="form-control">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="closeStructureModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Structure</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Payslip Modal -->
+  <div class="modal d-block bg-dark bg-opacity-50" tabIndex="-1" *ngIf="isPayslipModalOpen && selectedPayslip">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title fw-bold">PayCore Payslip Statement</h5>
+          <button type="button" class="btn-close" (click)="closePayslipModal()"></button>
+        </div>
+
+        <div class="modal-body p-4" id="printable-payslip">
+          <div class="border p-4 bg-white rounded">
+            <!-- Company Header -->
+            <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
+              <div>
+                <h4 class="fw-bold mb-0 text-primary">PayCore</h4>
+                <div class="text-muted small">Human Capital Management Services</div>
+              </div>
+              <div class="text-end">
+                <h6 class="fw-bold mb-0">PAYSLIP FOR {{ selectedPayslip.monthName | uppercase }} {{ selectedPayslip.year }}</h6>
+                <div class="text-muted small">Payslip ID: PS-{{ selectedPayslip.id }}</div>
+              </div>
+            </div>
+
+            <!-- Employee Info Block -->
+            <div class="row mb-4 g-2 small">
+              <div class="col-6">
+                <div><span class="text-muted">Employee Code:</span> <strong>{{ selectedPayslip.employeeCode }}</strong></div>
+                <div><span class="text-muted">Employee Name:</span> <strong>{{ selectedPayslip.employeeName }}</strong></div>
+              </div>
+              <div class="col-6">
+                <div><span class="text-muted">Designation:</span> <strong>{{ selectedPayslip.designation }}</strong></div>
+                <div><span class="text-muted">Department:</span> <strong>{{ selectedPayslip.department }}</strong></div>
+              </div>
+            </div>
+
+            <!-- Earnings vs Deductions Table -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="border rounded p-3">
+                  <h6 class="fw-bold text-success border-bottom pb-2 mb-2">Earnings</h6>
+                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Basic Salary:</span><span>${{ selectedPayslip.basicSalary }}</span></div>
+                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>HRA:</span><span>${{ selectedPayslip.hra }}</span></div>
+                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Allowances:</span><span>${{ selectedPayslip.allowances }}</span></div>
+                  <div class="d-flex justify-content-between pt-2 fw-bold"><span>Gross Earnings:</span><span>${{ selectedPayslip.grossSalary }}</span></div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="border rounded p-3">
+                  <h6 class="fw-bold text-danger border-bottom pb-2 mb-2">Deductions</h6>
+                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Provident Fund (PF):</span><span>${{ selectedPayslip.pfDeduction }}</span></div>
+                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Tax Deduction:</span><span>${{ selectedPayslip.taxDeduction }}</span></div>
+                  <div class="d-flex justify-content-between py-1 border-bottom small">
+                    <span>Unpaid Leave ({{ selectedPayslip.unpaidLeaveDays }} Days):</span>
+                    <span class="text-danger">-${{ selectedPayslip.unpaidLeaveDeduction }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between pt-2 fw-bold text-danger"><span>Total Deductions:</span><span>-${{ selectedPayslip.totalDeductions }}</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Payable Banner -->
+            <div class="p-3 bg-light border rounded d-flex justify-content-between align-items-center">
+              <span class="fw-bold fs-6">NET TAKE-HOME SALARY</span>
+              <span class="fw-bold fs-4 text-success">${{ selectedPayslip.netPay }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="closePayslipModal()">Close</button>
+          <button type="button" class="btn btn-primary" (click)="printPayslip()">Print / Download PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

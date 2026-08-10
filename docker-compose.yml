@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  paycore-db:
+    image: postgres:15-alpine
+    container_name: paycore-db
+    environment:
+      POSTGRES_DB: paycoredb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d paycoredb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  paycore-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: paycore-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://paycore-db:5432/paycoredb
+      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgrespassword
+      SPRING_JPA_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      CORS_ALLOWED_ORIGINS: "http://localhost,http://localhost:80,http://localhost:4200"
+    depends_on:
+      paycore-db:
+        condition: service_healthy
+
+  paycore-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: paycore-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - paycore-backend
+
+volumes:
+  pgdata:

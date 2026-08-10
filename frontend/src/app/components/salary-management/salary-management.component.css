@@ -1,0 +1,14 @@
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-payslip, #printable-payslip * {
+    visibility: visible;
+  }
+  #printable-payslip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

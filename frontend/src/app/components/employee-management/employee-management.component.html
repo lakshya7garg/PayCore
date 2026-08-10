@@ -1,0 +1,219 @@
+<div class="container-fluid p-4">
+  <!-- Admin / Accountant View -->
+  <div *ngIf="authService.isAdmin() || authService.isAccountant()">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+      <div>
+        <h4 class="fw-bold mb-1">Employee Directory</h4>
+        <p class="text-muted small mb-0">Manage organization personnel records and credentials</p>
+      </div>
+      <button class="btn btn-primary" (click)="openAddModal()" *ngIf="authService.isAdmin()">
+        + Add New Employee
+      </button>
+    </div>
+
+    <!-- Alert Messages -->
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show p-2 small mb-3">
+      {{ successMessage }}
+      <button type="button" class="btn-close p-2" (click)="successMessage=''"></button>
+    </div>
+    <div *ngIf="errorMessage && !isModalOpen" class="alert alert-danger alert-dismissible fade show p-2 small mb-3">
+      {{ errorMessage }}
+      <button type="button" class="btn-close p-2" (click)="errorMessage=''"></button>
+    </div>
+
+    <!-- Search Toolbar -->
+    <div class="card p-3 mb-4">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-6">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Search by name, ID, mobile, designation, or department..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="filterEmployees()"
+          >
+        </div>
+        <div class="col-md-6 text-end text-muted small">
+          Showing {{ filteredEmployees.length }} of {{ employees.length }} records
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Table -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Full Name</th>
+                <th>Designation</th>
+                <th>Department</th>
+                <th>Mobile Number</th>
+                <th>Date of Birth</th>
+                <th>Email</th>
+                <th *ngIf="authService.isAdmin()" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of filteredEmployees">
+                <td class="fw-bold text-primary">{{ emp.employeeCode }}</td>
+                <td class="fw-medium">{{ emp.firstName }} {{ emp.lastName }}</td>
+                <td>{{ emp.designation }}</td>
+                <td>{{ emp.department || 'N/A' }}</td>
+                <td>{{ emp.mobileNumber }}</td>
+                <td>{{ emp.dob }}</td>
+                <td>{{ emp.email }}</td>
+                <td *ngIf="authService.isAdmin()" class="text-end">
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="openEditModal(emp)">Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteEmployee(emp)">Delete</button>
+                </td>
+              </tr>
+              <tr *ngIf="filteredEmployees.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">No employee records match your search criteria.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Self-Profile View -->
+  <div *ngIf="authService.isEmployee() && selfProfile">
+    <div class="mb-4 pb-2 border-bottom">
+      <h4 class="fw-bold mb-1">My Self Profile</h4>
+      <p class="text-muted small mb-0">Your registered employee profile details</p>
+    </div>
+
+    <div class="card p-4" style="max-width: 700px;">
+      <div class="row g-3">
+        <div class="col-sm-4 text-muted">Employee Code:</div>
+        <div class="col-sm-8 fw-bold text-primary">{{ selfProfile.employeeCode }}</div>
+
+        <div class="col-sm-4 text-muted">First Name:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.firstName }}</div>
+
+        <div class="col-sm-4 text-muted">Last Name:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.lastName }}</div>
+
+        <div class="col-sm-4 text-muted">Date of Birth:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.dob }}</div>
+
+        <div class="col-sm-4 text-muted">Mobile Number:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.mobileNumber }}</div>
+
+        <div class="col-sm-4 text-muted">Email Address:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.email }}</div>
+
+        <div class="col-sm-4 text-muted">Designation:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.designation }}</div>
+
+        <div class="col-sm-4 text-muted">Department:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.department }}</div>
+
+        <div class="col-sm-4 text-muted">Joining Date:</div>
+        <div class="col-sm-8 fw-medium">{{ selfProfile.joiningDate }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Employee Modal -->
+  <div class="modal d-block bg-dark bg-opacity-50" tabIndex="-1" *ngIf="isModalOpen">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">{{ isEditMode ? 'Edit Employee Record' : 'Add New Employee' }}</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+
+        <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+          <div class="modal-body">
+            <div *ngIf="errorMessage" class="alert alert-danger p-2 small mb-3">
+              {{ errorMessage }}
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name *</label>
+                <input type="text" formControlName="firstName" class="form-control" placeholder="John"
+                  [ngClass]="{ 'is-invalid': employeeForm.get('firstName')?.touched && employeeForm.get('firstName')?.invalid }">
+                <div class="invalid-feedback">First name is required.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Last Name *</label>
+                <input type="text" formControlName="lastName" class="form-control" placeholder="Doe"
+                  [ngClass]="{ 'is-invalid': employeeForm.get('lastName')?.touched && employeeForm.get('lastName')?.invalid }">
+                <div class="invalid-feedback">Last name is required.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Date of Birth *</label>
+                <input type="date" formControlName="dob" class="form-control"
+                  [ngClass]="{ 'is-invalid': employeeForm.get('dob')?.touched && employeeForm.get('dob')?.invalid }">
+                <div class="invalid-feedback">Date of birth is required.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Mobile Number (10 Digits, Unique) *</label>
+                <input type="text" formControlName="mobileNumber" class="form-control" placeholder="9876543210"
+                  [ngClass]="{ 'is-invalid': employeeForm.get('mobileNumber')?.touched && employeeForm.get('mobileNumber')?.invalid }">
+                <div class="invalid-feedback">Must be a valid, unique 10-digit mobile number.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Designation / Role *</label>
+                <select formControlName="designation" class="form-select"
+                  [ngClass]="{ 'is-invalid': employeeForm.get('designation')?.touched && employeeForm.get('designation')?.invalid }">
+                  <option value="">Select Designation</option>
+                  <option *ngFor="let des of designationOptions" [value]="des">{{ des }}</option>
+                </select>
+                <div class="invalid-feedback">Designation is required.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Department *</label>
+                <select formControlName="department" class="form-select">
+                  <option *ngFor="let dept of departmentOptions" [value]="dept">{{ dept }}</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Joining Date *</label>
+                <input type="date" formControlName="joiningDate" class="form-control">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email Address *</label>
+                <input type="email" formControlName="email" class="form-control" placeholder="john.doe@company.com"
+                  [ngClass]="{ 'is-invalid': employeeForm.get('email')?.touched && employeeForm.get('email')?.invalid }">
+                <div class="invalid-feedback">Valid email is required.</div>
+              </div>
+
+              <div class="col-md-6" *ngIf="!isEditMode">
+                <label class="form-label">Default Password</label>
+                <input type="password" formControlName="password" class="form-control" placeholder="Password123!">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">System Security Role *</label>
+                <select formControlName="role" class="form-select">
+                  <option value="ROLE_EMPLOYEE">EMPLOYEE</option>
+                  <option value="ROLE_ACCOUNTANT">ACCOUNTANT</option>
+                  <option value="ROLE_ADMIN">ADMIN</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update Record' : 'Create Employee' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

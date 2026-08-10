@@ -1,0 +1,122 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+      <h4 class="fw-bold mb-1">Financial & Payroll Reports</h4>
+      <p class="text-muted small mb-0">Accountant reporting engine & payroll export center</p>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="card p-3 mb-4">
+    <h6 class="fw-bold mb-3">Report Filtering Criteria</h6>
+
+    <form [formGroup]="filterForm" (ngSubmit)="onGenerateReport()">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Search by Employee</label>
+          <select formControlName="employeeId" class="form-select">
+            <option [ngValue]="null">All Employees</option>
+            <option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.employeeCode }} - {{ emp.firstName }} {{ emp.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Month</label>
+          <select formControlName="month" class="form-select">
+            <option *ngFor="let m of monthOptions" [ngValue]="m.value">{{ m.label }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Year</label>
+          <select formControlName="year" class="form-select">
+            <option [ngValue]="null">All Years</option>
+            <option *ngFor="let y of yearOptions" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">From Date</label>
+          <input type="date" formControlName="fromDate" class="form-control">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">To Date</label>
+          <input type="date" formControlName="toDate" class="form-control">
+        </div>
+
+        <div class="col-12 d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm px-3" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+              Apply Filter & Refresh
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="resetFilters()">
+              Reset Filters
+            </button>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-success btn-sm" (click)="downloadCsv()" [disabled]="reportResults.length === 0 || downloadingCsv">
+              <span *ngIf="downloadingCsv" class="spinner-border spinner-border-sm me-1"></span>
+              Export CSV Report
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="downloadPdf()" [disabled]="reportResults.length === 0 || downloadingPdf">
+              <span *ngIf="downloadingPdf" class="spinner-border spinner-border-sm me-1"></span>
+              Export PDF Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Preview Results Table -->
+  <div class="card">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+      <span class="fw-bold">Report Preview</span>
+      <span class="text-muted small">Found {{ reportResults.length }} payslip records</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead>
+            <tr>
+              <th>Emp Code</th>
+              <th>Employee Name</th>
+              <th>Designation</th>
+              <th>Department</th>
+              <th>Month / Year</th>
+              <th>Unpaid Days</th>
+              <th>Gross Salary</th>
+              <th>PF Ded.</th>
+              <th>Tax Ded.</th>
+              <th>Leave Ded.</th>
+              <th>Net Take-Home</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ps of reportResults">
+              <td class="fw-bold text-primary">{{ ps.employeeCode }}</td>
+              <td>{{ ps.employeeName }}</td>
+              <td>{{ ps.designation }}</td>
+              <td>{{ ps.department }}</td>
+              <td>{{ ps.monthName }} {{ ps.year }}</td>
+              <td>{{ ps.unpaidLeaveDays }} Days</td>
+              <td class="fw-medium">${{ ps.grossSalary }}</td>
+              <td class="text-danger">-${{ ps.pfDeduction }}</td>
+              <td class="text-danger">-${{ ps.taxDeduction }}</td>
+              <td class="text-danger">-${{ ps.unpaidLeaveDeduction }}</td>
+              <td class="fw-bold text-success">${{ ps.netPay }}</td>
+            </tr>
+            <tr *ngIf="reportResults.length === 0">
+              <td colspan="11" class="text-center text-muted py-4">No report records match the selected filter criteria.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

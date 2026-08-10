@@ -1,0 +1,168 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+      <h4 class="fw-bold mb-1">Leave Management</h4>
+      <p class="text-muted small mb-0">Apply for leave, track requests, and manage employee time-off approvals</p>
+    </div>
+    <button class="btn btn-primary" (click)="openApplyModal()">
+      + Apply for Leave
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show p-2 small mb-3">
+    {{ successMessage }}
+    <button type="button" class="btn-close p-2" (click)="successMessage=''"></button>
+  </div>
+  <div *ngIf="errorMessage && !isApplyModalOpen && !isReviewModalOpen" class="alert alert-danger alert-dismissible fade show p-2 small mb-3">
+    {{ errorMessage }}
+    <button type="button" class="btn-close p-2" (click)="errorMessage=''"></button>
+  </div>
+
+  <!-- Leave History Grid -->
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead>
+            <tr>
+              <th>Request #</th>
+              <th>Employee Name</th>
+              <th>Leave Category</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Total Days</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th *ngIf="authService.isAdmin()" class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let leave of leaveRequests">
+              <td>#LR-{{ leave.id }}</td>
+              <td class="fw-medium">{{ leave.employeeName }} ({{ leave.employeeCode }})</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-primary': leave.leaveType === 'PAID',
+                  'bg-warning text-dark': leave.leaveType === 'UNPAID',
+                  'bg-info text-dark': leave.leaveType === 'SICK',
+                  'bg-secondary': leave.leaveType === 'CASUAL'
+                }">{{ leave.leaveType }}</span>
+              </td>
+              <td>{{ leave.startDate }}</td>
+              <td>{{ leave.endDate }}</td>
+              <td class="fw-bold">{{ leave.daysCount }} Day(s)</td>
+              <td style="max-width: 200px;" class="text-truncate">{{ leave.reason }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-warning text-dark': leave.status === 'PENDING',
+                  'bg-success': leave.status === 'APPROVED',
+                  'bg-danger': leave.status === 'REJECTED'
+                }">{{ leave.status }}</span>
+              </td>
+              <td *ngIf="authService.isAdmin()" class="text-end">
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="openReviewModal(leave)" *ngIf="leave.status === 'PENDING'">
+                  Review
+                </button>
+                <span *ngIf="leave.status !== 'PENDING'" class="text-muted small">Reviewed</span>
+              </td>
+            </tr>
+            <tr *ngIf="leaveRequests.length === 0">
+              <td colspan="9" class="text-center text-muted py-4">No leave applications found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply Leave Modal -->
+  <div class="modal d-block bg-dark bg-opacity-50" tabIndex="-1" *ngIf="isApplyModalOpen">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Apply for Leave</h5>
+          <button type="button" class="btn-close" (click)="closeApplyModal()"></button>
+        </div>
+        <form [formGroup]="applyForm" (ngSubmit)="onApplySubmit()">
+          <div class="modal-body">
+            <div *ngIf="errorMessage" class="alert alert-danger p-2 small mb-3">{{ errorMessage }}</div>
+
+            <div class="mb-3">
+              <label class="form-label">Leave Type *</label>
+              <select formControlName="leaveType" class="form-select">
+                <option *ngFor="let t of leaveTypes" [value]="t">{{ t }} LEAVE</option>
+              </select>
+              <small class="text-muted" *ngIf="applyForm.get('leaveType')?.value === 'UNPAID'">
+                Note: Unpaid leave days will be deducted from your monthly net salary.
+              </small>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label">Start Date *</label>
+                <input type="date" formControlName="startDate" class="form-control"
+                  [ngClass]="{ 'is-invalid': applyForm.get('startDate')?.touched && applyForm.get('startDate')?.invalid }">
+              </div>
+              <div class="col-6">
+                <label class="form-label">End Date *</label>
+                <input type="date" formControlName="endDate" class="form-control"
+                  [ngClass]="{ 'is-invalid': applyForm.get('endDate')?.touched && applyForm.get('endDate')?.invalid }">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Reason for Leave *</label>
+              <textarea formControlName="reason" class="form-control" rows="3" placeholder="Provide reason for time off..."
+                [ngClass]="{ 'is-invalid': applyForm.get('reason')?.touched && applyForm.get('reason')?.invalid }"></textarea>
+              <div class="invalid-feedback">Reason is required (min 5 characters).</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="closeApplyModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Submit Application</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manager Review Modal (Admin Only) -->
+  <div class="modal d-block bg-dark bg-opacity-50" tabIndex="-1" *ngIf="isReviewModalOpen && selectedLeave">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Review Leave Request #{{ selectedLeave.id }}</h5>
+          <button type="button" class="btn-close" (click)="closeReviewModal()"></button>
+        </div>
+        <form [formGroup]="reviewForm" (ngSubmit)="onReviewSubmit()">
+          <div class="modal-body">
+            <div class="mb-3 bg-light p-3 rounded">
+              <div class="small"><span class="text-muted">Applicant:</span> <strong>{{ selectedLeave.employeeName }} ({{ selectedLeave.employeeCode }})</strong></div>
+              <div class="small"><span class="text-muted">Category:</span> <strong>{{ selectedLeave.leaveType }}</strong> &bull; {{ selectedLeave.daysCount }} Day(s)</div>
+              <div class="small"><span class="text-muted">Dates:</span> {{ selectedLeave.startDate }} to {{ selectedLeave.endDate }}</div>
+              <div class="small mt-2"><span class="text-muted">Reason:</span> "{{ selectedLeave.reason }}"</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Decision Status *</label>
+              <select formControlName="status" class="form-select">
+                <option value="APPROVED">APPROVE</option>
+                <option value="REJECTED">REJECT</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Manager Comments</label>
+              <textarea formControlName="comments" class="form-control" rows="2" placeholder="Optional notes for employee..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="closeReviewModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Submit Decision</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

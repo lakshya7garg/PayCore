@@ -1,0 +1,101 @@
+<div *ngIf="!authService.currentUserValue">
+  <router-outlet></router-outlet>
+</div>
+
+<div *ngIf="authService.currentUserValue" class="d-flex flex-column min-vh-100">
+  <!-- Top Navigation Header -->
+  <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2 sticky-top">
+    <div class="container-fluid p-0">
+      <!-- PayCore Brand Text Logo -->
+      <a class="navbar-brand d-flex align-items-center me-4" routerLink="/dashboard">
+        <span class="fw-bold fs-4 text-primary tracking-tight">PayCore</span>
+        <span class="ms-2 badge bg-light text-dark border font-mono small">HCM</span>
+      </a>
+
+      <!-- Right Header Actions -->
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <!-- Notification Dropdown -->
+        <div class="position-relative">
+          <button class="btn btn-sm btn-outline-secondary position-relative" (click)="toggleNotifications()">
+            Notifications
+            <span *ngIf="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ unreadCount }}
+            </span>
+          </button>
+
+          <div *ngIf="isNotificationMenuOpen" class="card position-absolute end-0 mt-2 shadow-sm" style="width: 320px; z-index: 1050;">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
+              <span class="small fw-bold">In-App Notifications</span>
+              <button type="button" class="btn-close btn-sm" (click)="isNotificationMenuOpen = false"></button>
+            </div>
+            <div class="list-group list-group-flush overflow-auto" style="max-height: 280px;">
+              <div *ngFor="let note of notifications" class="list-group-item p-2" [ngClass]="{ 'bg-light': !note.isRead }">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <span class="fw-bold small">{{ note.title }}</span>
+                  <button *ngIf="!note.isRead" class="btn btn-link p-0 text-decoration-none small text-primary" (click)="markRead(note.id)">Mark Read</button>
+                </div>
+                <p class="mb-1 text-muted small" style="font-size: 0.8rem;">{{ note.message }}</p>
+                <div class="text-muted" style="font-size: 0.7rem;">{{ note.createdAt | date:'short' }}</div>
+              </div>
+              <div *ngIf="notifications.length === 0" class="p-3 text-center text-muted small">
+                No notifications.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Profile Pill & Logout -->
+        <div class="d-flex align-items-center gap-2 border-start ps-3">
+          <div class="text-end d-none d-sm-block">
+            <div class="fw-medium small mb-0">{{ authService.currentUserValue?.fullName }}</div>
+            <div class="text-muted" style="font-size: 0.75rem;">{{ authService.currentUserValue?.role }}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" (click)="logout()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main App Layout: Sidebar + Main Content -->
+  <div class="d-flex flex-grow-1">
+    <!-- Sidebar -->
+    <aside class="bg-white border-end py-3 px-2 d-flex flex-column" style="width: 240px; min-width: 240px;">
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item mb-1">
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link text-dark py-2 px-3">
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item mb-1">
+          <a routerLink="/employees" routerLinkActive="active" class="nav-link text-dark py-2 px-3">
+            Employee Directory
+          </a>
+        </li>
+        <li class="nav-item mb-1">
+          <a routerLink="/salary" routerLinkActive="active" class="nav-link text-dark py-2 px-3">
+            Salary & Payslips
+          </a>
+        </li>
+        <li class="nav-item mb-1">
+          <a routerLink="/leaves" routerLinkActive="active" class="nav-link text-dark py-2 px-3">
+            Leave Requests
+          </a>
+        </li>
+        <li class="nav-item mb-1" *ngIf="authService.isAccountant() || authService.isAdmin()">
+          <a routerLink="/reports" routerLinkActive="active" class="nav-link text-dark py-2 px-3">
+            Financial Reports
+          </a>
+        </li>
+      </ul>
+
+      <div class="p-3 bg-light rounded text-center small text-muted border">
+        PayCore Enterprise v1.0.0
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="flex-grow-1 bg-light">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
