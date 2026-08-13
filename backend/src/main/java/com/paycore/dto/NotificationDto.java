@@ -1,5 +1,6 @@
 package com.paycore.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public class NotificationDto {
@@ -7,6 +8,8 @@ public class NotificationDto {
     private Long id;
     private String title;
     private String message;
+    
+    @JsonProperty("isRead")
     private boolean isRead;
     private LocalDateTime createdAt;
 
@@ -44,6 +47,7 @@ public class NotificationDto {
         this.message = message;
     }
 
+    @JsonProperty("isRead")
     public boolean isRead() {
         return isRead;
     }

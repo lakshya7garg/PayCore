@@ -169,8 +169,8 @@
                 <tbody>
                   <tr *ngFor="let ps of myPayslips">
                     <td>{{ ps.monthName }} {{ ps.year }}</td>
-                    <td>${{ ps.grossSalary }}</td>
-                    <td class="fw-bold text-success">${{ ps.netPay }}</td>
+                    <td>₹{{ ps.grossSalary }}</td>
+                    <td class="fw-bold text-success">₹{{ ps.netPay }}</td>
                     <td>
                       <a routerLink="/salary" class="btn btn-sm btn-outline-secondary">View</a>
                     </td>

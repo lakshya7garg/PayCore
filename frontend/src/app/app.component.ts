@@ -38,8 +38,11 @@ export class AppComponent implements OnInit {
   loadNotifications(): void {
     this.notificationService.getMyNotifications().subscribe(res => {
       if (res.success && res.data) {
-        this.notifications = res.data;
-        this.unreadCount = res.data.filter(n => !n.isRead).length;
+        this.notifications = res.data.map(n => ({
+          ...n,
+          isRead: n.isRead ?? (n as any).read ?? false
+        }));
+        this.unreadCount = this.notifications.filter(n => !n.isRead).length;
       }
     });
   }
@@ -52,8 +55,20 @@ export class AppComponent implements OnInit {
   }
 
   markRead(id: number): void {
-    this.notificationService.markAsRead(id).subscribe(() => {
-      this.loadNotifications();
+    // Optimistic UI update for immediate response
+    const target = this.notifications.find(n => n.id === id);
+    if (target) {
+      target.isRead = true;
+      this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+    }
+
+    this.notificationService.markAsRead(id).subscribe({
+      next: () => {
+        this.loadNotifications();
+      },
+      error: () => {
+        this.loadNotifications();
+      }
     });
   }
 

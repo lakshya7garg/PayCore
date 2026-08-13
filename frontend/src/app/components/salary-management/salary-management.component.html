@@ -55,14 +55,14 @@
               <tr *ngFor="let str of salaryStructures">
                 <td class="fw-bold text-primary">{{ str.employeeCode }}</td>
                 <td>{{ str.employeeName }}</td>
-                <td>${{ str.basicSalary }}</td>
-                <td>${{ str.hra }}</td>
-                <td>${{ str.allowances }}</td>
-                <td>${{ str.medicalAllowance }}</td>
-                <td class="text-danger">-${{ str.pfDeduction }}</td>
-                <td class="text-danger">-${{ str.taxDeduction }}</td>
-                <td class="fw-medium">${{ str.totalGross }}</td>
-                <td class="fw-bold text-success">${{ str.totalNet }}</td>
+                <td>₹{{ str.basicSalary }}</td>
+                <td>₹{{ str.hra }}</td>
+                <td>₹{{ str.allowances }}</td>
+                <td>₹{{ str.medicalAllowance }}</td>
+                <td class="text-danger">-₹{{ str.pfDeduction }}</td>
+                <td class="text-danger">-₹{{ str.taxDeduction }}</td>
+                <td class="fw-medium">₹{{ str.totalGross }}</td>
+                <td class="fw-bold text-success">₹{{ str.totalNet }}</td>
                 <td *ngIf="authService.isAdmin()" class="text-end">
                   <button class="btn btn-sm btn-outline-secondary" (click)="openStructureModal(str)">Edit</button>
                 </td>
@@ -157,13 +157,13 @@
                 <td class="fw-bold text-primary">{{ ps.employeeCode }}</td>
                 <td>{{ ps.employeeName }}</td>
                 <td>{{ ps.monthName }} {{ ps.year }}</td>
-                <td>${{ ps.grossSalary }}</td>
+                <td>₹{{ ps.grossSalary }}</td>
                 <td>
-                  <span class="badge bg-warning text-dark" *ngIf="ps.unpaidLeaveDays > 0">{{ ps.unpaidLeaveDays }} Days (-${{ ps.unpaidLeaveDeduction }})</span>
+                  <span class="badge bg-warning text-dark" *ngIf="ps.unpaidLeaveDays > 0">{{ ps.unpaidLeaveDays }} Days (-₹{{ ps.unpaidLeaveDeduction }})</span>
                   <span class="text-muted" *ngIf="ps.unpaidLeaveDays === 0">0 Days</span>
                 </td>
-                <td class="text-danger">-${{ ps.totalDeductions }}</td>
-                <td class="fw-bold text-success">${{ ps.netPay }}</td>
+                <td class="text-danger">-₹{{ ps.totalDeductions }}</td>
+                <td class="fw-bold text-success">₹{{ ps.netPay }}</td>
                 <td class="text-end">
                   <button class="btn btn-sm btn-outline-primary" (click)="openPayslipModal(ps)">View Payslip</button>
                 </td>
@@ -200,27 +200,27 @@
 
             <div class="row g-3">
               <div class="col-6">
-                <label class="form-label">Basic Salary ($) *</label>
+                <label class="form-label">Basic Salary (₹) *</label>
                 <input type="number" formControlName="basicSalary" class="form-control">
               </div>
               <div class="col-6">
-                <label class="form-label">HRA ($) *</label>
+                <label class="form-label">HRA (₹) *</label>
                 <input type="number" formControlName="hra" class="form-control">
               </div>
               <div class="col-6">
-                <label class="form-label">Allowances ($) *</label>
+                <label class="form-label">Allowances (₹) *</label>
                 <input type="number" formControlName="allowances" class="form-control">
               </div>
               <div class="col-6">
-                <label class="form-label">Medical Allowance ($) *</label>
+                <label class="form-label">Medical Allowance (₹) *</label>
                 <input type="number" formControlName="medicalAllowance" class="form-control">
               </div>
               <div class="col-6">
-                <label class="form-label">PF Deduction ($) *</label>
+                <label class="form-label">PF Deduction (₹) *</label>
                 <input type="number" formControlName="pfDeduction" class="form-control">
               </div>
               <div class="col-6">
-                <label class="form-label">Tax Deduction ($) *</label>
+                <label class="form-label">Tax Deduction (₹) *</label>
                 <input type="number" formControlName="taxDeduction" class="form-control">
               </div>
             </div>
@@ -244,61 +244,121 @@
         </div>
 
         <div class="modal-body p-4" id="printable-payslip">
-          <div class="border p-4 bg-white rounded">
-            <!-- Company Header -->
-            <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
+          <div class="payslip-card bg-white rounded border p-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
               <div>
-                <h4 class="fw-bold mb-0 text-primary">PayCore</h4>
-                <div class="text-muted small">Human Capital Management Services</div>
+                <h3 class="fw-bold text-primary mb-0">PayCore</h3>
+                <p class="text-muted small mb-0">Payroll & HR Management Portal</p>
               </div>
               <div class="text-end">
-                <h6 class="fw-bold mb-0">PAYSLIP FOR {{ selectedPayslip.monthName | uppercase }} {{ selectedPayslip.year }}</h6>
-                <div class="text-muted small">Payslip ID: PS-{{ selectedPayslip.id }}</div>
+                <h5 class="fw-bold text-dark mb-0">PAYSLIP STATEMENT</h5>
+                <span class="badge bg-light text-dark border font-mono small">
+                  {{ selectedPayslip.monthName | uppercase }} {{ selectedPayslip.year }}
+                </span>
+                <div class="text-muted small mt-1">Payslip ID: PS-{{ selectedPayslip.id }}</div>
               </div>
             </div>
 
-            <!-- Employee Info Block -->
-            <div class="row mb-4 g-2 small">
-              <div class="col-6">
-                <div><span class="text-muted">Employee Code:</span> <strong>{{ selectedPayslip.employeeCode }}</strong></div>
-                <div><span class="text-muted">Employee Name:</span> <strong>{{ selectedPayslip.employeeName }}</strong></div>
-              </div>
-              <div class="col-6">
-                <div><span class="text-muted">Designation:</span> <strong>{{ selectedPayslip.designation }}</strong></div>
-                <div><span class="text-muted">Department:</span> <strong>{{ selectedPayslip.department }}</strong></div>
-              </div>
-            </div>
-
-            <!-- Earnings vs Deductions Table -->
-            <div class="row g-3 mb-4">
-              <div class="col-md-6">
-                <div class="border rounded p-3">
-                  <h6 class="fw-bold text-success border-bottom pb-2 mb-2">Earnings</h6>
-                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Basic Salary:</span><span>${{ selectedPayslip.basicSalary }}</span></div>
-                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>HRA:</span><span>${{ selectedPayslip.hra }}</span></div>
-                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Allowances:</span><span>${{ selectedPayslip.allowances }}</span></div>
-                  <div class="d-flex justify-content-between pt-2 fw-bold"><span>Gross Earnings:</span><span>${{ selectedPayslip.grossSalary }}</span></div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="border rounded p-3">
-                  <h6 class="fw-bold text-danger border-bottom pb-2 mb-2">Deductions</h6>
-                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Provident Fund (PF):</span><span>${{ selectedPayslip.pfDeduction }}</span></div>
-                  <div class="d-flex justify-content-between py-1 border-bottom small"><span>Tax Deduction:</span><span>${{ selectedPayslip.taxDeduction }}</span></div>
-                  <div class="d-flex justify-content-between py-1 border-bottom small">
-                    <span>Unpaid Leave ({{ selectedPayslip.unpaidLeaveDays }} Days):</span>
-                    <span class="text-danger">-${{ selectedPayslip.unpaidLeaveDeduction }}</span>
+            <!-- Employee Info Structured Card -->
+            <div class="card mb-4 bg-light border-0 shadow-sm">
+              <div class="card-body p-3">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Employee Details</h6>
+                <div class="row g-3 small">
+                  <div class="col-6">
+                    <div class="d-flex mb-1">
+                      <span class="text-muted" style="width: 130px;">Employee Code:</span>
+                      <strong class="text-primary">{{ selectedPayslip.employeeCode }}</strong>
+                    </div>
+                    <div class="d-flex mb-1">
+                      <span class="text-muted" style="width: 130px;">Employee Name:</span>
+                      <strong>{{ selectedPayslip.employeeName }}</strong>
+                    </div>
                   </div>
-                  <div class="d-flex justify-content-between pt-2 fw-bold text-danger"><span>Total Deductions:</span><span>-${{ selectedPayslip.totalDeductions }}</span></div>
+                  <div class="col-6">
+                    <div class="d-flex mb-1">
+                      <span class="text-muted" style="width: 130px;">Designation:</span>
+                      <strong>{{ selectedPayslip.designation }}</strong>
+                    </div>
+                    <div class="d-flex mb-1">
+                      <span class="text-muted" style="width: 130px;">Department:</span>
+                      <strong>{{ selectedPayslip.department }}</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Net Payable Banner -->
-            <div class="p-3 bg-light border rounded d-flex justify-content-between align-items-center">
-              <span class="fw-bold fs-6">NET TAKE-HOME SALARY</span>
-              <span class="fw-bold fs-4 text-success">${{ selectedPayslip.netPay }}</span>
+            <!-- Earnings and Deductions Side-by-Side Table -->
+            <div class="row g-4 mb-4">
+              <!-- Earnings Table -->
+              <div class="col-6">
+                <div class="border rounded p-3 h-100">
+                  <h6 class="fw-bold text-success border-bottom pb-2 mb-3">Earnings Component</h6>
+                  <table class="table table-sm table-borderless mb-0 small">
+                    <tbody>
+                      <tr>
+                        <td class="text-muted ps-0">Basic Salary</td>
+                        <td class="text-end fw-medium pe-0">₹{{ selectedPayslip.basicSalary }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted ps-0">House Rent Allowance (HRA)</td>
+                        <td class="text-end fw-medium pe-0">₹{{ selectedPayslip.hra }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted ps-0">Other Allowances</td>
+                        <td class="text-end fw-medium pe-0">₹{{ selectedPayslip.allowances }}</td>
+                      </tr>
+                      <tr class="border-top fw-bold">
+                        <td class="ps-0 pt-2 text-dark">Total Gross Earnings</td>
+                        <td class="text-end pt-2 text-dark pe-0">₹{{ selectedPayslip.grossSalary }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Deductions Table -->
+              <div class="col-6">
+                <div class="border rounded p-3 h-100">
+                  <h6 class="fw-bold text-danger border-bottom pb-2 mb-3">Deductions Component</h6>
+                  <table class="table table-sm table-borderless mb-0 small">
+                    <tbody>
+                      <tr>
+                        <td class="text-muted ps-0">Provident Fund (PF)</td>
+                        <td class="text-end fw-medium pe-0 text-danger">-₹{{ selectedPayslip.pfDeduction }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted ps-0">Tax Deduction (TDS)</td>
+                        <td class="text-end fw-medium pe-0 text-danger">-₹{{ selectedPayslip.taxDeduction }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted ps-0">Unpaid Leave ({{ selectedPayslip.unpaidLeaveDays }} Days)</td>
+                        <td class="text-end fw-medium pe-0 text-danger">-₹{{ selectedPayslip.unpaidLeaveDeduction }}</td>
+                      </tr>
+                      <tr class="border-top fw-bold">
+                        <td class="ps-0 pt-2 text-danger">Total Deductions</td>
+                        <td class="text-end pt-2 text-danger pe-0">-₹{{ selectedPayslip.totalDeductions }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Pay Summary Banner -->
+            <div class="p-3 bg-light border rounded-3 d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-uppercase fw-bold text-dark d-block">Net Take-Home Salary</span>
+                <span class="text-muted small">Transferred to Bank Account</span>
+              </div>
+              <div class="fs-3 fw-bold text-success">
+                ₹{{ selectedPayslip.netPay }}
+              </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-top text-center text-muted small">
+              This is a computer-generated document and does not require a physical signature.
             </div>
           </div>
         </div>

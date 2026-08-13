@@ -1,9 +1,21 @@
-<div class="min-vh-100 d-flex flex-column justify-content-center align-items-center bg-light py-5">
-  <div class="card p-4 shadow-sm" style="max-width: 420px; width: 100%;">
-    <div class="text-center mb-4">
-      <h3 class="fw-bold text-dark mb-1">PayCore</h3>
-      <p class="text-muted small">Payroll & HR Management Portal</p>
+<div class="min-vh-100 d-flex flex-column bg-light">
+  <!-- Minimal Top Header Bar -->
+  <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2">
+    <div class="container-fluid p-0">
+      <a class="navbar-brand d-flex align-items-center" routerLink="/">
+        <span class="fw-bold fs-4 text-primary tracking-tight">PayCore</span>
+        <span class="ms-2 badge bg-light text-dark border font-mono small">HCM</span>
+      </a>
     </div>
+  </header>
+
+  <!-- Login Main Content Container -->
+  <div class="flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5 px-3">
+    <div class="card p-4 shadow-sm" style="max-width: 420px; width: 100%;">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold text-primary mb-1">PayCore</h3>
+        <p class="text-muted small">Payroll & HR Management Portal</p>
+      </div>
 
     <div *ngIf="errorMessage" class="alert alert-danger p-2 small mb-3" role="alert">
       {{ errorMessage }}
@@ -53,6 +65,6 @@
         <button class="btn btn-outline-secondary btn-sm" (click)="fillDemo('employee@paycore.com')">Employee</button>
         <button class="btn btn-outline-secondary btn-sm" (click)="fillDemo('accountant@paycore.com')">Accountant</button>
       </div>
-    </div>
   </div>
+</div>
 </div>
