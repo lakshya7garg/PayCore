@@ -1,6 +1,6 @@
 <div class="container-fluid p-4">
-  <!-- Admin / Accountant View -->
-  <div *ngIf="authService.isAdmin() || authService.isAccountant()">
+  <!-- Admin View -->
+  <div *ngIf="authService.isAdmin()">
     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
       <div>
         <h4 class="fw-bold mb-1">Employee Directory</h4>
@@ -201,7 +201,6 @@
                 <label class="form-label">System Security Role *</label>
                 <select formControlName="role" class="form-select">
                   <option value="ROLE_EMPLOYEE">EMPLOYEE</option>
-                  <option value="ROLE_ACCOUNTANT">ACCOUNTANT</option>
                   <option value="ROLE_ADMIN">ADMIN</option>
                 </select>
               </div>

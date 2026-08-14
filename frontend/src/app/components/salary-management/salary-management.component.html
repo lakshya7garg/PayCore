@@ -6,7 +6,7 @@
     </div>
 
     <!-- Navigation Tabs for Admin -->
-    <div class="btn-group" *ngIf="authService.isAdmin() || authService.isAccountant()">
+    <div class="btn-group" *ngIf="authService.isAdmin()">
       <button class="btn btn-sm" [ngClass]="activeTab === 'structures' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'structures'">Salary Structures</button>
       <button class="btn btn-sm" [ngClass]="activeTab === 'generate' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'generate'" *ngIf="authService.isAdmin()">Generate Payslip</button>
       <button class="btn btn-sm" [ngClass]="activeTab === 'payslips' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'payslips'">View Payslips</button>
@@ -23,8 +23,8 @@
     <button type="button" class="btn-close p-2" (click)="errorMessage=''"></button>
   </div>
 
-  <!-- TAB 1: SALARY STRUCTURES (Admin/Accountant) -->
-  <div *ngIf="activeTab === 'structures' && (authService.isAdmin() || authService.isAccountant())">
+  <!-- TAB 1: SALARY STRUCTURES (Admin) -->
+  <div *ngIf="activeTab === 'structures' && authService.isAdmin()">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h6 class="fw-bold mb-0">Employee Salary Structures</h6>
       <button class="btn btn-sm btn-primary" (click)="openStructureModal()" *ngIf="authService.isAdmin()">
@@ -124,7 +124,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h6 class="fw-bold mb-0">Payslip Records</h6>
 
-      <div class="d-flex align-items-center gap-2" *ngIf="authService.isAdmin() || authService.isAccountant()">
+      <div class="d-flex align-items-center gap-2" *ngIf="authService.isAdmin()">
         <label class="text-muted small mb-0">Select Employee:</label>
         <select class="form-select form-select-sm" style="width: auto;" (change)="onEmployeeSelectForPayslips($event)">
           <option *ngFor="let emp of employees" [value]="emp.id">

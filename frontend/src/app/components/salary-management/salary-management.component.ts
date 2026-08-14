@@ -74,7 +74,7 @@ export class SalaryManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.authService.isAdmin() || this.authService.isAccountant()) {
+    if (this.authService.isAdmin()) {
       this.activeTab = 'structures';
       this.loadSalaryStructures();
       this.loadEmployees();

@@ -13,7 +13,7 @@ describe('EmployeeManagementComponent', () => {
 
   beforeEach(async () => {
     employeeServiceSpy = jasmine.createSpyObj('EmployeeService', ['getAllEmployees', 'createEmployee', 'getSelfProfile']);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['isAdmin', 'isAccountant', 'isEmployee']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['isAdmin', 'isEmployee']);
 
     employeeServiceSpy.getAllEmployees.and.returnValue(of({
       success: true,

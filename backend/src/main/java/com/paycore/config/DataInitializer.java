@@ -95,34 +95,6 @@ public class DataInitializer implements CommandLineRunner {
             );
             salaryStructureRepository.save(empSalary);
 
-            // 3. Seed Accountant User & Profile
-            User accUser = new User("accountant@paycore.com", passwordEncoder.encode("Password123!"), Role.ROLE_ACCOUNTANT);
-            userRepository.save(accUser);
-
-            Employee accEmp = new Employee(
-                    "EMP-1003",
-                    "Michael",
-                    "Scott",
-                    LocalDate.of(1980, 11, 4),
-                    "9876543212",
-                    "Financial Controller",
-                    "Finance",
-                    LocalDate.of(2021, 6, 1),
-                    accUser
-            );
-            employeeRepository.save(accEmp);
-
-            SalaryStructure accSalary = new SalaryStructure(
-                    accEmp,
-                    new BigDecimal("6200.00"),
-                    new BigDecimal("2000.00"),
-                    new BigDecimal("1300.00"),
-                    new BigDecimal("450.00"),
-                    new BigDecimal("500.00"),
-                    new BigDecimal("750.00")
-            );
-            salaryStructureRepository.save(accSalary);
-
             // 4. Seed Sample Leave Request
             LeaveRequest leave1 = new LeaveRequest(
                     regularEmp,
@@ -138,7 +110,6 @@ public class DataInitializer implements CommandLineRunner {
             // 5. Generate sample payslips
             salaryService.generatePayslip(regularEmp.getId(), 7, 2026);
             salaryService.generatePayslip(adminEmp.getId(), 7, 2026);
-            salaryService.generatePayslip(accEmp.getId(), 7, 2026);
 
             System.out.println(">>> PayCore Seed Data Successfully Initialized!");
         }

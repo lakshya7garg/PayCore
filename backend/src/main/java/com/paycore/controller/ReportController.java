@@ -21,14 +21,14 @@ public class ReportController {
     private ReportService reportService;
 
     @PostMapping("/employee-salary/filter")
-    @PreAuthorize("hasAnyRole('ACCOUNTANT', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<PayslipDto>>> getFilteredReportData(@RequestBody ReportFilterDto filter) {
         List<PayslipDto> data = reportService.filterReportData(filter);
         return ResponseEntity.ok(new ApiResponse<>(true, "Report data retrieved", data));
     }
 
     @PostMapping("/employee-salary/csv")
-    @PreAuthorize("hasAnyRole('ACCOUNTANT', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> downloadCsvReport(@RequestBody ReportFilterDto filter) {
         try {
             byte[] csvBytes = reportService.generateCsvReport(filter);
@@ -42,7 +42,7 @@ public class ReportController {
     }
 
     @PostMapping("/employee-salary/pdf")
-    @PreAuthorize("hasAnyRole('ACCOUNTANT', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> downloadPdfReport(@RequestBody ReportFilterDto filter) {
         try {
             byte[] pdfBytes = reportService.generatePdfReport(filter);

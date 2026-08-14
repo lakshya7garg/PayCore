@@ -48,7 +48,7 @@ export class DashboardComponent implements OnInit {
       this.employeeCode = user.employeeCode || '';
     }
 
-    if (this.authService.isAdmin() || this.authService.isAccountant()) {
+    if (this.authService.isAdmin()) {
       this.loadAdminDashboardData();
     } else {
       this.loadEmployeeDashboardData();

@@ -31,14 +31,14 @@ public class SalaryController {
     private EmployeeService employeeService;
 
     @GetMapping("/structures")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<SalaryStructureDto>>> getAllSalaryStructures() {
         List<SalaryStructureDto> structures = salaryService.getAllSalaryStructures();
         return ResponseEntity.ok(new ApiResponse<>(true, "Salary structures retrieved", structures));
     }
 
     @GetMapping("/structures/employee/{employeeId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<SalaryStructureDto>> getStructureByEmployee(@PathVariable Long employeeId) {
         SalaryStructureDto structure = salaryService.getSalaryStructureByEmployeeId(employeeId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Salary structure retrieved", structure));
@@ -77,7 +77,7 @@ public class SalaryController {
     }
 
     @GetMapping("/payslips/employee/{employeeId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<PayslipDto>>> getEmployeePayslips(@PathVariable Long employeeId) {
         List<PayslipDto> payslips = salaryService.getEmployeePayslips(employeeId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Employee payslips retrieved", payslips));

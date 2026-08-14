@@ -43,10 +43,6 @@ export class AuthService {
     return this.userRole === 'ROLE_ADMIN';
   }
 
-  public isAccountant(): boolean {
-    return this.userRole === 'ROLE_ACCOUNTANT';
-  }
-
   public isEmployee(): boolean {
     return this.userRole === 'ROLE_EMPLOYEE';
   }

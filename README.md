@@ -16,15 +16,14 @@ PayCore is a complete, full-stack Human Capital Management (HCM) platform built 
 ## Project Features
 
 ### 1. Role-Based Access Control (RBAC)
-- **Admin (`ROLE_ADMIN`):** Full CRUD on employees, salary structures, leave approvals, and payslip generation.
-- **Employee (`ROLE_EMPLOYEE`):** Self-profile view, view/download personal payslips, apply for leave.
-- **Accountant (`ROLE_ACCOUNTANT`):** Access financial reports, filter payslip records, export CSV and PDF reports.
+- **Admin (`ROLE_ADMIN`):** Full CRUD on employees, salary structures, leave approvals, financial reports, and payslip generation.
+- **Employee (`ROLE_EMPLOYEE`):** Self-profile view, view personal payslips, apply for leave.
 
 ### 2. Core Modules
 - **Employee Management:** Full employee CRUD, auto-generated Employee IDs (`EMP-1001`), date picker for DOB, unique mobile number verification, designation/department dropdowns, automatic welcome notification.
 - **Salary & Payslip Service:** Admin salary structure configuration (Basic, HRA, Allowances, Medical, PF, Tax), monthly payslip generation with automatic **Unpaid Leave Deductions** calculation (`Daily Rate = Gross / 30 * Unpaid Days`). Interactive printable payslip modal.
 - **Leave Management:** Employee leave application form (Paid, Unpaid, Sick, Casual), manager approval/rejection interface, in-app notification dispatch.
-- **Financial Reports:** Accountant filtering engine (Month/Year, Date Range, Employee filter) with CSV and PDF export capability.
+- **Financial Reports:** Admin filtering engine (Month/Year, Date Range, Employee filter) with CSV and PDF export capability.
 
 ---
 
@@ -36,7 +35,6 @@ The application automatically seeds initial accounts and demo data on startup:
 | :--- | :--- | :--- | :--- |
 | **Admin** | `admin@paycore.com` | `Password123!` | `EMP-1001` |
 | **Employee** | `employee@paycore.com` | `Password123!` | `EMP-1002` |
-| **Accountant** | `accountant@paycore.com` | `Password123!` | `EMP-1003` |
 
 ---
 

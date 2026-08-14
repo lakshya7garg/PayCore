@@ -71,7 +71,7 @@ export class EmployeeManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.authService.isAdmin() || this.authService.isAccountant()) {
+    if (this.authService.isAdmin()) {
       this.loadEmployees();
     } else {
       this.loadSelfProfile();

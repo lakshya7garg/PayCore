@@ -7,25 +7,19 @@
     </div>
   </div>
 
-  <!-- Admin / Accountant View -->
-  <div *ngIf="authService.isAdmin() || authService.isAccountant()">
+  <!-- Admin View -->
+  <div *ngIf="authService.isAdmin()">
     <div class="row g-3 mb-4">
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card p-3">
           <div class="text-muted small">Total Employees</div>
           <div class="h3 fw-bold mb-0 text-primary">{{ totalEmployees }}</div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card p-3">
           <div class="text-muted small">Pending Leave Approvals</div>
           <div class="h3 fw-bold mb-0 text-warning">{{ pendingLeavesCount }}</div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card p-3">
-          <div class="text-muted small">System Status</div>
-          <div class="h3 fw-bold mb-0 text-success">Active / Healthy</div>
         </div>
       </div>
     </div>
