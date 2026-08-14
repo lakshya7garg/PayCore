@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/login/login.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { EmployeeManagementComponent } from './components/employee-management/employee-management.component';
-import { SalaryManagementComponent } from './components/salary-management/salary-management.component';
-import { LeaveManagementComponent } from './components/leave-management/leave-management.component';
-import { AuthGuard } from './guards/auth.guard';
+import { LoginComponent } from './features/login/login.component';
+import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { EmployeeManagementComponent } from './features/employee/employee-management.component';
+import { SalaryManagementComponent } from './features/salary/salary-management.component';
+import { LeaveManagementComponent } from './features/leave/leave-management.component';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },

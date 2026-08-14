@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LeaveService } from '../../services/leave.service';
-import { AuthService } from '../../services/auth.service';
-import { LeaveRequest, LeaveStatus, LeaveType } from '../../models/leave.model';
+import { LeaveService } from './leave.service';
+import { AuthService } from '../../core/services/auth.service';
+import { LeaveRequest, LeaveStatus, LeaveType } from './leave.model';
 
 @Component({
   selector: 'app-leave-management',

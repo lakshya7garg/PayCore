@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReportService } from '../../services/report.service';
-import { EmployeeService } from '../../services/employee.service';
-import { AuthService } from '../../services/auth.service';
-import { Payslip } from '../../models/salary.model';
-import { Employee } from '../../models/employee.model';
-import { ReportFilter } from '../../models/report.model';
+import { ReportService } from './report.service';
+import { EmployeeService } from '../employee/employee.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Payslip } from '../salary/salary.model';
+import { Employee } from '../employee/employee.model';
+import { ReportFilter } from './report.model';
 
 @Component({
   selector: 'app-reports',

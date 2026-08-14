@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { EmployeeService } from '../../services/employee.service';
-import { AuthService } from '../../services/auth.service';
-import { Employee } from '../../models/employee.model';
+import { EmployeeService } from './employee.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Employee } from './employee.model';
 
 @Component({
   selector: 'app-employee-management',

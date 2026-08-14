@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '../models/user.model';
-import { Payslip } from '../models/salary.model';
-import { ReportFilter } from '../models/report.model';
-import { environment } from '../../environments/environment';
+import { ApiResponse } from '../../core/models/user.model';
+import { Payslip } from '../salary/salary.model';
+import { ReportFilter } from './report.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

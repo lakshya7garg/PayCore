@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from './services/auth.service';
-import { NotificationService } from './services/notification.service';
-import { NotificationItem } from './models/notification.model';
+import { AuthService } from './core/services/auth.service';
+import { NotificationService } from './core/services/notification.service';
+import { NotificationItem } from './core/models/notification.model';
 
 @Component({
   selector: 'app-root',

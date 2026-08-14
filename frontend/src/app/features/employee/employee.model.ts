@@ -1,4 +1,4 @@
-import { UserRole } from './user.model';
+import { UserRole } from '../../core/models/user.model';
 
 export interface Employee {
   id?: number;

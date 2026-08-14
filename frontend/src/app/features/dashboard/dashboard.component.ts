@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { EmployeeService } from '../../services/employee.service';
-import { LeaveService } from '../../services/leave.service';
-import { SalaryService } from '../../services/salary.service';
-import { Employee } from '../../models/employee.model';
-import { LeaveRequest } from '../../models/leave.model';
-import { Payslip } from '../../models/salary.model';
+import { AuthService } from '../../core/services/auth.service';
+import { EmployeeService } from '../employee/employee.service';
+import { LeaveService } from '../leave/leave.service';
+import { SalaryService } from '../salary/salary.service';
+import { Employee } from '../employee/employee.model';
+import { LeaveRequest } from '../leave/leave.model';
+import { Payslip } from '../salary/salary.model';
 
 @Component({
   selector: 'app-dashboard',

@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { EmployeeManagementComponent } from './employee-management.component';
-import { EmployeeService } from '../../services/employee.service';
-import { AuthService } from '../../services/auth.service';
+import { EmployeeService } from './employee.service';
+import { AuthService } from '../../core/services/auth.service';
 
 describe('EmployeeManagementComponent', () => {
   let component: EmployeeManagementComponent;
