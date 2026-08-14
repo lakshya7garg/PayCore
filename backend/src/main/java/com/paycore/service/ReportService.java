@@ -53,8 +53,8 @@ public class ReportService {
         // Header
         writer.writeNext(new String[]{
                 "Payslip ID", "Employee Code", "Employee Name", "Designation", "Department",
-                "Month", "Year", "Gross Salary ($)", "PF Deduction ($)", "Tax Deduction ($)",
-                "Unpaid Leave Days", "Unpaid Leave Deduction ($)", "Total Deductions ($)", "Net Pay ($)"
+                "Month", "Year", "Gross Salary (₹)", "PF Deduction (₹)", "Tax Deduction (₹)",
+                "Unpaid Leave Days", "Unpaid Leave Deduction (₹)", "Total Deductions (₹)", "Net Pay (₹)"
         });
 
         // Data rows
@@ -127,11 +127,11 @@ public class ReportService {
             addCell(table, p.getDesignation(), tableCellFont, bg, Element.ALIGN_LEFT);
             addCell(table, p.getMonthName() + " " + p.getYear(), tableCellFont, bg, Element.ALIGN_CENTER);
             addCell(table, String.valueOf(p.getUnpaidLeaveDays()), tableCellFont, bg, Element.ALIGN_CENTER);
-            addCell(table, "$" + p.getGrossSalary(), tableCellFont, bg, Element.ALIGN_RIGHT);
-            addCell(table, "$" + p.getPfDeduction(), tableCellFont, bg, Element.ALIGN_RIGHT);
-            addCell(table, "$" + p.getTaxDeduction(), tableCellFont, bg, Element.ALIGN_RIGHT);
-            addCell(table, "$" + p.getUnpaidLeaveDeduction(), tableCellFont, bg, Element.ALIGN_RIGHT);
-            addCell(table, "$" + p.getNetPay(), tableCellFont, bg, Element.ALIGN_RIGHT);
+            addCell(table, "₹" + p.getGrossSalary(), tableCellFont, bg, Element.ALIGN_RIGHT);
+            addCell(table, "₹" + p.getPfDeduction(), tableCellFont, bg, Element.ALIGN_RIGHT);
+            addCell(table, "₹" + p.getTaxDeduction(), tableCellFont, bg, Element.ALIGN_RIGHT);
+            addCell(table, "₹" + p.getUnpaidLeaveDeduction(), tableCellFont, bg, Element.ALIGN_RIGHT);
+            addCell(table, "₹" + p.getNetPay(), tableCellFont, bg, Element.ALIGN_RIGHT);
         }
 
         document.add(table);

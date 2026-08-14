@@ -136,7 +136,7 @@ public class SalaryService {
             notificationService.createNotification(
                     employee.getUser(),
                     "Payslip Generated",
-                    "Your payslip for " + monthName + " " + year + " has been generated. Net Pay: $" + netPay
+                    "Your payslip for " + monthName + " " + year + " has been generated. Net Pay: ₹" + netPay
             );
         }
 

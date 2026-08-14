@@ -195,7 +195,7 @@ export class SalaryManagementComponent implements OnInit {
       next: (res) => {
         this.loading = false;
         if (res.success && res.data) {
-          this.successMessage = `Payslip generated for ${res.data.employeeName} (${res.data.monthName} ${res.data.year}). Unpaid Leave Deduction: $${res.data.unpaidLeaveDeduction}`;
+          this.successMessage = `Payslip generated for ${res.data.employeeName} (${res.data.monthName} ${res.data.year}). Unpaid Leave Deduction: ₹${res.data.unpaidLeaveDeduction}`;
           this.openPayslipModal(res.data);
           this.salaryService.getEmployeePayslips(employeeId).subscribe(pRes => {
             if (pRes.success && pRes.data) {
